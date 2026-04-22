@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Dedoc\Scramble\Scramble;
+use Illuminate\Routing\Route;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Scramble::routes(function (Route $route) {
+            return $route->middleware('api') &&
+                $route->getPrefix() === 'api';
+        })->info([
+            'title' => 'Disperkim API',
+            'description' => 'REST API Documentation untuk Sistem Manajemen Sampah Disperkim',
+            'version' => '1.0.0',
+        ])->ui(\Dedoc\Scramble\UI\ScrambleUI::class);
     }
 }
+
