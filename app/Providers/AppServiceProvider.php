@@ -21,14 +21,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Scramble::routes(function (Route $route) {
+        $scramble = Scramble::routes(function (Route $route) {
             return $route->middleware('api') &&
                 $route->getPrefix() === 'api';
-        })->info([
-            'title' => 'Disperkim API',
-            'description' => 'REST API Documentation untuk Sistem Manajemen Sampah Disperkim',
-            'version' => '1.0.0',
-        ])->ui(\Dedoc\Scramble\UI\ScrambleUI::class);
+        });
+
+        if ($scramble) {
+            $scramble->info([
+                'title' => 'Disperkim API',
+                'description' => 'REST API Documentation untuk Sistem Manajemen Sampah Disperkim',
+                'version' => '1.0.0',
+            ])->ui(\Dedoc\Scramble\UI\ScrambleUI::class);
+        }
     }
 }
 

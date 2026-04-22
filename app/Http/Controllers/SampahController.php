@@ -9,14 +9,13 @@ use Illuminate\Http\Response;
 /**
  * Sampah Controller
  * 
- * Mengelola operasi CRUD untuk data Sampah
+ * API Sampah
  */
 class SampahController extends Controller
 {
     /**
      * Get all sampah
      * 
-     * Mengambil semua data sampah dengan sort by id dan jenis_sampah (10 per page)
      * 
      * @queryParam sort_by string Sort field: 'id' atau 'jenis_sampah' (default: 'id')
      * @queryParam order string Sort order: 'asc' atau 'desc' (default: 'asc')
@@ -63,21 +62,57 @@ class SampahController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        // $validated = $request->validate([
+
+        //     'id' => 'required|string|unique:sampah,id',
+        //     'jenis_sampah' => 'required|string|max:191',
+        //     'harga' => 'required|integer|min:0',
+        //     'satuan' => 'required|string|max:191',
+        //     'deskripsi' => 'required|string|max:191'
+        // ]);
+
+        $validated = validator::make($request->all(), [
             'id' => 'required|string|unique:sampah,id',
             'jenis_sampah' => 'required|string|max:191',
             'harga' => 'required|integer|min:0',
             'satuan' => 'required|string|max:191',
             'deskripsi' => 'required|string|max:191'
-        ]);
+        ], [
 
-        $sampah = Sampah::create($validated);
+        'id.required' => 'ID sampah wajib diisi',
+        'id.string' => 'ID sampah harus berupa string', 
+        'id.unique' => 'ID sampah sudah digunakan',
+        'jenis_sampah.required' => 'Jenis sampah wajib diisi',
+        'jenis_sampah.string' => 'Jenis sampah harus berupa string',
+        'jenis_sampah.max' => 'Jenis sampah maksimal 191 karakter',
+        'harga.required' => 'Harga sampah wajib diisi',
+        'harga.integer' => 'Harga sampah harus berupa integer',
+        'harga.min' => 'Harga sampah minimal 0',
+        'satuan.required' => 'Satuan wajib diisi',
+        'satuan.string' => 'Satuan harus berupa string',
+        'satuan.max' => 'Satuan maksimal 191 karakter',
+        'deskripsi.required' => 'Deskripsi sampah wajib diisi',
+        'deskripsi.string' => 'Deskripsi sampah harus berupa string',
+        'deskripsi.max' => 'Deskripsi sampah maksimal 191 karakter'
+    ]);
 
+
+
+    if ($validated->fails()) {
         return response()->json([
-            'status' => 'success',
-            'message' => 'Sampah created successfully',
-            'data' => $sampah
-        ], Response::HTTP_CREATED);
+            'status' => 'error',
+            'message' => 'Validation failed',
+            'errors' => $validated->errors()
+        ], Response::HTTP_BAD_REQUEST);
+    }
+
+    $sampah = Sampah::create($validated->validated());
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Sampah created successfully',
+        'data' => $sampah
+    ], Response::HTTP_CREATED);
     }
 
     /**
